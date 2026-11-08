@@ -12,7 +12,8 @@ as a dependency.
 which [swiftly](https://www.swift.org/swiftly/) reads, and CI uses the same version on every
 platform. For the web, install the Swift SDK for Wasm of the same version from
 [swift.org](https://www.swift.org/install/) and build with
-`swift build --swift-sdk swift-6.4.2-RELEASE_wasm`.
+`swift build --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream` (the generator does not build
+there, so name the product).
 
 ## Testing
 

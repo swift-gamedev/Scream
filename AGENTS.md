@@ -91,7 +91,7 @@ Platform checks in Swift source are allowed only inside `Scream`, never in examp
 These commands apply once the package exists.
 
 - `swift build` builds Flecs and everything else. Requires the Swift version in `.swift-version` (swiftly installs it).
-- `swift build --swift-sdk swift-6.4.2-RELEASE_wasm` builds for Wasm; the SDK version must match `.swift-version` (`swift sdk list` shows what is installed). The output runs under any WASI runtime, including Node's `node:wasi`.
+- `swift build --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream` builds for Wasm; the SDK version must match `.swift-version` (`swift sdk list` shows what is installed). Name the product, because `scream-generate` uses `Foundation.Process`, which WASI does not have, so a plain `swift build` fails there. The output runs under any WASI runtime, including Node's `node:wasi`.
 - `swift test` runs the Swift Testing suites. `swift test --sanitize=address` and `--sanitize=thread` on Linux are required for anything touching hooks, callbacks, boxes or threads, and CI runs both. That is Swift's sanitizer flag and is unrelated to `FLECS_SANITIZE`.
 - `swift run scream-generate` regenerates `Sources/Scream/Generated/` and the API Coverage page; `--check` only verifies. Run it after touching `Tools/Generate/` or `wrapped.txt`.
 - CI builds and tests on Linux, Windows and macOS, and builds and runs the examples on Wasm. A change that only builds on the platform you happen to be on is not done. When a CI job fails on a platform you cannot run, read the log and fix it; do not disable the job.

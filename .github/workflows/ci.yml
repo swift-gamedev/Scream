@@ -63,9 +63,10 @@ jobs:
             https://download.swift.org/swift-6.4.2-release/wasm-sdk/swift-6.4.2-RELEASE/swift-6.4.2-RELEASE_wasm.artifactbundle.tar.gz \
             --checksum 83baca83553f8c443cda7b84800912e6e709c3acd2e7ebf277794ca5836c0da5
       - name: Build
-        run: swift build --swift-sdk swift-6.4.2-RELEASE_wasm
+        # Only the library: the generator uses Foundation.Process, which WASI does not have.
+        run: swift build --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream
       - name: Build in release
-        run: swift build -c release --swift-sdk swift-6.4.2-RELEASE_wasm
+        run: swift build -c release --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream
 
   macos:
     name: macOS

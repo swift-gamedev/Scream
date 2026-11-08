@@ -25,7 +25,7 @@ A Swift toolchain, from swift.org or Xcode.
 
 The Swift SDK for Wasm, which targets WASI (`wasm32-unknown-wasip1`), installed with
 `swift sdk install` from [swift.org](https://www.swift.org/install/). Build with
-`swift build --swift-sdk swift-6.4.2-RELEASE_wasm`; the result runs under any WASI runtime,
+`swift build --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream`; the result runs under any WASI runtime,
 including Node's `node:wasi`, or in a browser through
 [JavaScriptKit](https://github.com/swiftwasm/JavaScriptKit)'s PackageToJS plugin.
 
