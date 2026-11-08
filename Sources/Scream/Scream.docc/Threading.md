@@ -19,10 +19,14 @@ pointer to a world, so they can be stored in components and sent anywhere.
 ## Frames and stages
 
 ``World/progress(deltaTime:)`` puts the world in readonly mode, runs every system in phase order,
-then merges the stages. A ``Stage`` is a per-thread queue of writes: adding, removing, setting and
-deleting through it is deferred until the merge, while reads see the world as it is. That is why
-a system can delete the entity it is looking at without breaking the iteration. Outside a frame,
-``World/deferred(_:)`` gives the same behavior for a block of code.
+then merges the stages. A ``Stage`` is a per-thread queue of structural changes: adding,
+removing, deleting, and setting a component an entity does not have yet are deferred until the
+merge, while reads see the world as it is. That is why a system can delete the entity it is
+looking at without breaking the iteration. Setting a component the entity already has is not
+structural: Flecs writes the value at once and defers only the change notification. In a
+multi-threaded system, change the components the closure declared through their ``Mut``
+accessors, which is what the terms are for, and keep the stage for structural changes. Outside a
+frame, ``World/deferred(_:)`` gives the same behavior for a block of code.
 
 ## Multi-threaded systems
 
