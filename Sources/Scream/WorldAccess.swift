@@ -5,8 +5,9 @@ import CFlecsShims
 /// components, tags and relationships.
 ///
 /// On a `World` every operation happens at once. On a `Stage`, which system and observer
-/// closures receive, writes are queued and applied when the stage is merged, at the end of the
-/// frame or of ``World/deferred(_:)``; reads see the world as it is.
+/// closures receive, structural changes are queued and applied when the stage is merged, at the
+/// end of the frame or of ``World/deferred(_:)``; reads, and writes to components an entity
+/// already has, go straight to the world. ``Stage`` has the details.
 public protocol WorldAccess: ~Copyable {
     /// The `ecs_world_t` (or stage) underneath, for calling Flecs' C API directly.
     var flecsWorld: OpaquePointer { get }

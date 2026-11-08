@@ -87,10 +87,12 @@ public struct World: ~Copyable, WorldAccess {
         return Stage(flecsWorld: stage)
     }
 
-    /// Runs `body` with a stage whose writes are queued and applied when `body` returns.
+    /// Runs `body` with a stage whose structural changes are queued and applied when `body`
+    /// returns.
     ///
-    /// Use it to make structural changes while iterating, where changing a table under the
-    /// iterator would be an error. Reads through the stage see the world as it is.
+    /// Use it to add, remove, delete or create while iterating, where changing a table under the
+    /// iterator would be an error. Reads through the stage see the world as it is, and so do
+    /// writes to components an entity already has; see ``Stage``.
     public func deferred<R>(_ body: (Stage) throws -> R) rethrows -> R {
         guard let stage = ecs_get_stage(flecsWorld, 0) else {
             fatalError("Flecs has no stage 0 for this world")

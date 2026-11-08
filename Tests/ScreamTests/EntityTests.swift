@@ -137,7 +137,7 @@ struct EntityTests {
         #expect(baseUnchanged?.points == 100)
     }
 
-    @Test("Stages queue writes until merged")
+    @Test("Stages queue structural changes until merged")
     func deferred() {
         let world = World()
         let entity = world.entity()
@@ -148,5 +148,18 @@ struct EntityTests {
         }
         let merged = world.get(entity, Health.self)
         #expect(merged?.points == 5)
+
+        // Replacing a value the entity already has is not structural: Flecs 4.2 writes it at
+        // once and queues only the change notification.
+        world.deferred { stage in
+            stage.set(entity, Health(points: 6))
+            let already = world.get(entity, Health.self)
+            #expect(already?.points == 6)
+            stage.add(entity, Player.self)
+            let tagNotYet = world.has(entity, Player.self)
+            #expect(tagNotYet == false)
+        }
+        let tagged = world.has(entity, Player.self)
+        #expect(tagged)
     }
 }
