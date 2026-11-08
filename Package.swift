@@ -7,6 +7,10 @@ let package = Package(
     products: [
         .library(name: "Scream", targets: ["Scream"])
     ],
+    dependencies: [
+        // Builds the DocC catalog with `swift package generate-documentation`.
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.5.0")
+    ],
     targets: [
         // Flecs' own source, a git submodule at a tagged release under flecs/. flecs.c at the top
         // level of the target includes the amalgamated flecs/distr/flecs.c, so the submodule itself
@@ -45,6 +49,13 @@ let package = Package(
         .testTarget(
             name: "ScreamTests",
             dependencies: ["Scream"]
+        ),
+        // Writes Sources/Scream/Generated and the API coverage page from the declarations in
+        // flecs.h, read through clang's JSON AST dump.
+        .executableTarget(
+            name: "scream-generate",
+            path: "Tools/Generate",
+            exclude: ["wrapped.txt"]
         ),
     ],
     cLanguageStandard: .gnu11

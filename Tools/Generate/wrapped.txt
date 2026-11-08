@@ -1,0 +1,12 @@
+# Flecs functions that Scream wraps, one per line: the C name, then the Swift symbol that
+# replaces it. scream-generate turns this into the API Coverage page and fails if a C name does
+# not exist in flecs.h.
+#
+# Keep this in step with Sources/Scream: add a line when you wrap a function.
+
+# World
+ecs_init World.init()
+ecs_fini World (deinit)
+ecs_progress World.progress(deltaTime:)
+ecs_quit World.quit()
+ecs_should_quit World.shouldQuit

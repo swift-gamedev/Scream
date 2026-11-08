@@ -26,7 +26,9 @@ jobs:
           swift --version 2>&1 | grep -q "Swift version $expected " || {
             echo "Container has $(swift --version 2>&1 | head -1), .swift-version says $expected"; exit 1; }
       - name: Lint
-        run: swift format lint --strict --recursive Sources/Scream Tests Package.swift
+        run: swift format lint --strict --recursive Sources/Scream Tools Tests Package.swift
+      - name: Generated code is up to date
+        run: swift run scream-generate --check
       - name: Build
         run: swift build
       - name: Test
@@ -41,6 +43,8 @@ jobs:
         # The file lists races inside Flecs that it accepts by design. The path comes from $PWD
         # because github.workspace is the host's path, which does not exist inside this container.
         run: TSAN_OPTIONS="suppressions=$PWD/Tests/tsan-suppressions.txt" swift test --sanitize=thread --disable-xctest
+      - name: Documentation
+        run: swift package generate-documentation --target Scream --warnings-as-errors
 
   wasm:
     name: Wasm

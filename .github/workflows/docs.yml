@@ -1,0 +1,69 @@
+name: Docs
+
+# Publishes the DocC catalog to GitHub Pages at https://swift-gamedev.github.io/Scream/ on every
+# push to main. Pull requests only check that the docs build, in the Linux job of ci.yml.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Nothing by default; each job asks for what it needs, and only deploy can write to Pages.
+permissions: {}
+
+# One deployment at a time, and never cancel one halfway through.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    # Keep in step with .swift-version, like the Linux job in ci.yml.
+    container: swift:6.4.2-noble
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+          persist-credentials: false
+      - name: Generate the documentation
+        run: |
+          swift package --allow-writing-to-directory site \
+            generate-documentation --target Scream --warnings-as-errors \
+            --transform-for-static-hosting --hosting-base-path Scream --output-path site
+      - name: Send the site root to the landing page
+        # DocC's root index.html is an empty shell that shows "page not found". Every page has its
+        # own copy of that shell, so the root can be replaced with a redirect.
+        run: |
+          cat > site/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+          <head>
+          <meta charset="utf-8">
+          <title>Scream</title>
+          <meta http-equiv="refresh" content="0; url=documentation/scream/">
+          <link rel="canonical" href="documentation/scream/">
+          </head>
+          <body><a href="documentation/scream/">Scream documentation</a></body>
+          </html>
+          EOF
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}documentation/scream/
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
