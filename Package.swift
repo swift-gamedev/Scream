@@ -4,8 +4,16 @@ import PackageDescription
 
 let package = Package(
     name: "Scream",
+    platforms: [
+        // The tools in this package use URL and clock APIs that need macOS 13.
+        .macOS(.v13)
+    ],
     products: [
         .library(name: "Scream", targets: ["Scream"])
+    ],
+    dependencies: [
+        // Builds the DocC catalog with `swift package generate-documentation`.
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.5.0")
     ],
     targets: [
         // Flecs' own source, a git submodule at a tagged release under flecs/. flecs.c at the top
@@ -45,6 +53,13 @@ let package = Package(
         .testTarget(
             name: "ScreamTests",
             dependencies: ["Scream"]
+        ),
+        // Writes Sources/Scream/Generated and the API coverage page from the declarations in
+        // flecs.h, read through clang's JSON AST dump.
+        .executableTarget(
+            name: "scream-generate",
+            path: "Tools/Generate",
+            exclude: ["wrapped.txt"]
         ),
     ],
     cLanguageStandard: .gnu11

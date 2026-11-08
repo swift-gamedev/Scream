@@ -26,7 +26,9 @@ jobs:
           swift --version 2>&1 | grep -q "Swift version $expected " || {
             echo "Container has $(swift --version 2>&1 | head -1), .swift-version says $expected"; exit 1; }
       - name: Lint
-        run: swift format lint --strict --recursive Sources/Scream Tests Package.swift
+        run: swift format lint --strict --recursive Sources/Scream Tools Tests Package.swift
+      - name: Generated code is up to date
+        run: swift run scream-generate --check
       - name: Build
         run: swift build
       - name: Test
@@ -41,6 +43,8 @@ jobs:
         # The file lists races inside Flecs that it accepts by design. The path comes from $PWD
         # because github.workspace is the host's path, which does not exist inside this container.
         run: TSAN_OPTIONS="suppressions=$PWD/Tests/tsan-suppressions.txt" swift test --sanitize=thread --disable-xctest
+      - name: Documentation
+        run: swift package generate-documentation --target Scream --warnings-as-errors
 
   wasm:
     name: Wasm
@@ -59,9 +63,10 @@ jobs:
             https://download.swift.org/swift-6.4.2-release/wasm-sdk/swift-6.4.2-RELEASE/swift-6.4.2-RELEASE_wasm.artifactbundle.tar.gz \
             --checksum 83baca83553f8c443cda7b84800912e6e709c3acd2e7ebf277794ca5836c0da5
       - name: Build
-        run: swift build --swift-sdk swift-6.4.2-RELEASE_wasm
+        # Only the library: the generator uses Foundation.Process, which WASI does not have.
+        run: swift build --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream
       - name: Build in release
-        run: swift build -c release --swift-sdk swift-6.4.2-RELEASE_wasm
+        run: swift build -c release --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream
 
   macos:
     name: macOS

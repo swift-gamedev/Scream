@@ -4,7 +4,7 @@
 
 Scream is a set of idiomatic Swift bindings for [Flecs](https://github.com/SanderMertens/flecs), the entity component system. The name comes from a group of swifts sometimes being called a "screaming party". It is the sibling of [Swaylib](https://github.com/swift-gamedev/Swaylib), which does the same job for raylib, and it follows the same conventions unless this file says otherwise. It is cross platform first: Linux, Windows and macOS are all first-class targets, and nothing may assume Apple frameworks or Darwin APIs. The web is a goal too, through Swift's Wasm SDK (see Platform support). Swift Package Manager is the only build system. License: MIT, the same as Flecs (`LICENSE` at the root). Third-party code comes in as a git submodule with its own license, never as a copy, and nothing under a stricter license (GPL, LGPL) may be added.
 
-**Status:** the skeleton exists. Flecs 4.2.0 builds from a git submodule with SwiftPM on Linux, macOS, Windows and Wasm, the shims and layout test are in place, and a `World` can be created from Swift. The rest of the Layout section and the API design rules describe what comes next. When code changes what this file says, or a design here turns out to be wrong, update this file in the same change.
+**Status:** the skeleton exists. Flecs 4.2.0 builds from a git submodule with SwiftPM on Linux, macOS, Windows and Wasm, the shims and layout test are in place, a `World` can be created from Swift, and the generator writes the enums, builtin entities and API coverage page. The rest of the Layout section and the API design rules describe what comes next. When code changes what this file says, or a design here turns out to be wrong, update this file in the same change.
 
 Goals:
 
@@ -91,7 +91,7 @@ Platform checks in Swift source are allowed only inside `Scream`, never in examp
 These commands apply once the package exists.
 
 - `swift build` builds Flecs and everything else. Requires the Swift version in `.swift-version` (swiftly installs it).
-- `swift build --swift-sdk swift-6.4.2-RELEASE_wasm` builds for Wasm; the SDK version must match `.swift-version` (`swift sdk list` shows what is installed). The output runs under any WASI runtime, including Node's `node:wasi`.
+- `swift build --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream` builds for Wasm; the SDK version must match `.swift-version` (`swift sdk list` shows what is installed). Name the product, because `scream-generate` uses `Foundation.Process`, which WASI does not have, so a plain `swift build` fails there. The output runs under any WASI runtime, including Node's `node:wasi`.
 - `swift test` runs the Swift Testing suites. `swift test --sanitize=address` and `--sanitize=thread` on Linux are required for anything touching hooks, callbacks, boxes or threads, and CI runs both. That is Swift's sanitizer flag and is unrelated to `FLECS_SANITIZE`.
 - `swift run scream-generate` regenerates `Sources/Scream/Generated/` and the API Coverage page; `--check` only verifies. Run it after touching `Tools/Generate/` or `wrapped.txt`.
 - CI builds and tests on Linux, Windows and macOS, and builds and runs the examples on Wasm. A change that only builds on the platform you happen to be on is not done. When a CI job fails on a platform you cannot run, read the log and fix it; do not disable the job.
