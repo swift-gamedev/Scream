@@ -47,7 +47,28 @@ the Swift SDK for Wasm from the same page and build with `--swift-sdk`.
 ## Try the examples
 
 Flecs is a git submodule, so clone with `--recurse-submodules` (SwiftPM does that for you when
-Scream is a dependency). Then `swift run <Example>`; the examples are listed in `Examples/`.
+Scream is a dependency). The console examples print and exit:
+
+```
+swift run HelloWorld
+swift run Hierarchy
+swift run Observers
+```
+
+They run on the web too: build one with `--swift-sdk swift-6.4.2-RELEASE_wasm --product HelloWorld`
+and run the `.wasm` with `node Examples/run-wasm.mjs`.
+
+Two more draw a world with [Swaylib](https://github.com/swift-gamedev/Swaylib). They live in their
+own package, so Scream never depends on Swaylib:
+
+```
+cd Examples/SwaylibExamples
+swift run BouncingBalls
+swift run SolarSystem
+```
+
+Those need the X11 and OpenGL headers on Linux, as Swaylib's README says, and honor
+`SWAYLIB_FRAMES=60 SWAYLIB_SCREENSHOT=out.png` to draw 60 frames, save a screenshot and exit.
 
 ## Documentation
 
@@ -58,8 +79,9 @@ wrapped. Build it locally with `swift package generate-documentation --target Sc
 ## Status
 
 An MVP: entities, components, pairs, hierarchies, prefabs, typed queries, systems (including
-multi-threaded ones), observers and Flecs' log, tested on Linux in debug and release and under
-the sanitizers; Windows, macOS and Wasm build on CI but have not been checked by a person yet. See
+multi-threaded ones), observers and Flecs' log, with examples, tested on Linux in debug and release
+and under the sanitizers; Windows, macOS and Wasm build and run the examples on CI but have not
+been checked by a person yet. See
 the roadmap in the docs, and `AGENTS.md` for the design.
 
 ## License

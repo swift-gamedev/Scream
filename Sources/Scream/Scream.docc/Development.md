@@ -30,6 +30,18 @@ TSAN_OPTIONS=suppressions=$PWD/Tests/tsan-suppressions.txt swift test --sanitize
 checker would otherwise report. Scream's tests are all Swift Testing. The suppressions file lists
 two races inside Flecs that Flecs accepts by design; nothing of Scream's is suppressed.
 
+## Examples
+
+The console examples (`HelloWorld`, `Hierarchy`, `Observers`) are executable targets of the
+package that print and exit, so CI runs them on every platform, including Wasm with
+`node Examples/run-wasm.mjs <file.wasm>`. The ones that draw with Swaylib are the separate
+package `Examples/SwaylibExamples`, with Scream as a path dependency, so Scream itself never
+depends on Swaylib or needs X11 to build. CI runs them for 20 frames with `SWAYLIB_FRAMES` and
+`SWAYLIB_SCREENSHOT` under Xvfb on Linux and directly on macOS, and keeps the screenshots as
+artifacts. When adding an example, add an executable target in `Package.swift`, add it to every
+job's example list in `.github/workflows/ci.yml` (the Windows job spells them out), and list it in
+the README.
+
 ## Benchmarks
 
 `swift run -c release IterationBenchmark` moves a million entities for fifty frames through a
