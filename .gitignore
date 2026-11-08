@@ -1,0 +1,8 @@
+.build/
+.swiftpm/
+.docc-build/
+*.xcodeproj
+.DS_Store
+*.log
+.playwright-cli/
+.playwright-mcp/

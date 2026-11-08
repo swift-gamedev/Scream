@@ -4,7 +4,7 @@
 
 Scream is a set of idiomatic Swift bindings for [Flecs](https://github.com/SanderMertens/flecs), the entity component system. The name comes from a group of swifts sometimes being called a "screaming party". It is the sibling of [Swaylib](https://github.com/swift-gamedev/Swaylib), which does the same job for raylib, and it follows the same conventions unless this file says otherwise. It is cross platform first: Linux, Windows and macOS are all first-class targets, and nothing may assume Apple frameworks or Darwin APIs. The web is a goal too, through Swift's Wasm SDK (see Platform support). Swift Package Manager is the only build system. License: MIT, the same as Flecs (`LICENSE` at the root). Third-party code comes in as a git submodule with its own license, never as a copy, and nothing under a stricter license (GPL, LGPL) may be added.
 
-**Status:** nothing is built yet. The repository holds this file, the license and the agent skills. The Layout section and everything under Flecs integration describe the intended design. When code changes what this file says, or a design here turns out to be wrong, update this file in the same change.
+**Status:** the skeleton exists. Flecs 4.2.0 builds from a git submodule with SwiftPM on Linux, macOS, Windows and Wasm, the shims and layout test are in place, and a `World` can be created from Swift. The rest of the Layout section and the API design rules describe what comes next. When code changes what this file says, or a design here turns out to be wrong, update this file in the same change.
 
 Goals:
 
@@ -17,8 +17,6 @@ Goals:
 Non-goals (for now): mobile, and replacing Flecs' C code with Swift. Scream wraps Flecs; it does not reimplement it. Scream also has no renderer, window or game loop. Using it next to Swaylib must work, but neither package depends on the other.
 
 ## Layout
-
-All of this is planned.
 
 - `Sources/CFlecs/`: Flecs' repository as a shallow git submodule under `flecs/`, pinned to a release tag; the pinned commit is the version and the license is inside. SwiftPM never compiles `flecs/` directly: the wrapper `flecs.c` includes the amalgamated `flecs/distr/flecs.c`, and `include/CFlecs.h` is the umbrella header that sets Flecs' configuration macros and includes `flecs/distr/flecs.h` by relative path. Never modify the submodule; anything we need to change goes into a wrapper or a shim. Updating Flecs is: move the submodule to the new tag, regenerate, fix what broke. There is deliberately no option to link a system Flecs: the bindings are tied to one release.
 - `Sources/CFlecsShims/`: C helpers for what Swift cannot call or import. Function-like macros such as `ecs_pair` become `static inline` functions here, so their definitions stay next to the C and cannot drift from it. Access to the mutable global `ecs_os_api` also lives here.

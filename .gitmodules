@@ -1,0 +1,4 @@
+[submodule "Sources/CFlecs/flecs"]
+	path = Sources/CFlecs/flecs
+	url = https://github.com/SanderMertens/flecs.git
+	shallow = true
