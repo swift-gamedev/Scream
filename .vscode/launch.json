@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Debug scream-generate",
+            "target": "scream-generate",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug scream-generate"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Release scream-generate",
+            "target": "scream-generate",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release scream-generate"
+        }
+    ]
+}
