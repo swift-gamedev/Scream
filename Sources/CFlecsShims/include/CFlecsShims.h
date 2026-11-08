@@ -38,6 +38,22 @@ static inline ecs_entity_t screamStripGeneration(ecs_entity_t entity) {
     return ecs_strip_generation(entity);
 }
 
+// Type hook flags. ECS_TYPE_HOOK_*_ILLEGAL are macros with casts.
+
+static inline ecs_flags32_t screamHookCtorIllegal(void) {
+    return ECS_TYPE_HOOK_CTOR_ILLEGAL;
+}
+
+static inline ecs_flags32_t screamHookCopyIllegal(void) {
+    return ECS_TYPE_HOOK_COPY_ILLEGAL | ECS_TYPE_HOOK_COPY_CTOR_ILLEGAL;
+}
+
+// Frees memory that Flecs allocated and handed over, such as the string from ecs_get_path.
+// ecs_os_free is a macro over the mutable global ecs_os_api, which Swift cannot read safely.
+static inline void screamFree(void *pointer) {
+    ecs_os_free(pointer);
+}
+
 // Logging. Flecs formats the message before it reaches ecs_os_api.log_, so the handler receives
 // a finished string. level is Flecs' level: negative for errors and warnings, 0 for trace, higher
 // for debug detail.

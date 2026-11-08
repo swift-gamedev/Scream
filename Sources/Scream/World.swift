@@ -5,11 +5,11 @@ import CFlecsShims
 ///
 /// A world owns its Flecs state and destroys it when it goes out of scope. It can be moved to
 /// another thread but not shared between threads; systems that run in parallel do so inside
-/// ``progress(deltaTime:)``, on threads Flecs manages.
-public struct World: ~Copyable {
-    /// The `ecs_world_t` this world owns.
-    @usableFromInline
-    let raw: OpaquePointer
+/// ``progress(deltaTime:)``, on threads Flecs manages. Everything you do with entities is in
+/// ``WorldAccess``, which a world's ``Stage``s share.
+public struct World: ~Copyable, WorldAccess {
+    /// The `ecs_world_t` this world owns, for calling Flecs' C API directly.
+    public let flecsWorld: OpaquePointer
 
     /// Creates an empty world with Flecs' builtin components, phases and addons.
     public init() {
@@ -18,12 +18,15 @@ public struct World: ~Copyable {
         guard let world = screamInitWorld() else {
             fatalError("Flecs could not create a world")
         }
-        raw = world
+        flecsWorld = world
+        ecs_set_binding_ctx(flecsWorld, Unmanaged.passRetained(WorldContext()).toOpaque(), releaseContext)
     }
 
     deinit {
-        _ = screamFiniWorld(raw)
+        _ = screamFiniWorld(flecsWorld)
     }
+
+    // MARK: Frames
 
     /// Runs one frame: every system in the pipeline, in phase order.
     ///
@@ -31,16 +34,81 @@ public struct World: ~Copyable {
     /// - Returns: `false` once ``quit()`` has been called, so a loop can stop.
     @discardableResult
     public func progress(deltaTime: Float = 0) -> Bool {
-        ecs_progress(raw, deltaTime)
+        ecs_progress(flecsWorld, deltaTime)
     }
 
     /// Makes the next ``progress(deltaTime:)`` return `false`.
     public func quit() {
-        ecs_quit(raw)
+        ecs_quit(flecsWorld)
     }
 
     /// Whether ``quit()`` has been called.
     public var shouldQuit: Bool {
-        ecs_should_quit(raw)
+        ecs_should_quit(flecsWorld)
     }
+
+    /// The time the last frame took, in seconds, as passed to or measured by
+    /// ``progress(deltaTime:)``.
+    public var deltaTime: Float {
+        ecs_get_world_info(flecsWorld).pointee.delta_time
+    }
+
+    /// How many frames ``progress(deltaTime:)`` has run.
+    public var frameCount: Int {
+        Int(ecs_get_world_info(flecsWorld).pointee.frame_count_total)
+    }
+
+    /// Caps the frame rate: ``progress(deltaTime:)`` sleeps so frames take at least
+    /// `1 / targetFPS` seconds. 0 removes the cap.
+    public var targetFPS: Float {
+        get { ecs_get_world_info(flecsWorld).pointee.target_fps }
+        nonmutating set { ecs_set_target_fps(flecsWorld, newValue) }
+    }
+
+    // MARK: Threads and stages
+
+    /// Sets how many threads run multi-threaded systems during ``progress(deltaTime:)``.
+    ///
+    /// Flecs creates `count - 1` worker threads and uses the calling thread as well. On Wasm,
+    /// which has no threads, this does nothing and every system runs on the calling thread.
+    public func setThreads(_ count: Int) {
+        #if arch(wasm32)
+        _ = count
+        #else
+        ecs_set_threads(flecsWorld, Int32(count))
+        #endif
+    }
+
+    /// The stage for thread `index`, for code that runs during a frame outside a system.
+    public func stage(_ index: Int = 0) -> Stage {
+        guard let stage = ecs_get_stage(flecsWorld, Int32(index)) else {
+            fatalError("Flecs has no stage \(index) for this world; see setThreads(_:)")
+        }
+        return Stage(flecsWorld: stage)
+    }
+
+    /// Runs `body` with a stage whose writes are queued and applied when `body` returns.
+    ///
+    /// Use it to make structural changes while iterating, where changing a table under the
+    /// iterator would be an error. Reads through the stage see the world as it is.
+    public func deferred<R>(_ body: (Stage) throws -> R) rethrows -> R {
+        guard let stage = ecs_get_stage(flecsWorld, 0) else {
+            fatalError("Flecs has no stage 0 for this world")
+        }
+        defer { ecs_merge(stage) }
+        return try body(Stage(flecsWorld: stage))
+    }
+
+    /// Runs `body` with the world locked: writes must go through a ``stage(_:)`` and are merged
+    /// when the block ends. This is what ``progress(deltaTime:)`` does around its systems.
+    public func readonly<R>(_ body: () throws -> R) rethrows -> R {
+        _ = ecs_readonly_begin(flecsWorld, false)
+        defer { ecs_readonly_end(flecsWorld) }
+        return try body()
+    }
+}
+
+private let releaseContext: @convention(c) (UnsafeMutableRawPointer?) -> Void = { context in
+    guard let context else { return }
+    Unmanaged<WorldContext>.fromOpaque(context).release()
 }

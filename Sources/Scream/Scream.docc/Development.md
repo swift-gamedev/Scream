@@ -19,8 +19,15 @@ there, so name the product).
 
 `swift test` runs the Swift Testing suites. CI also runs them in release, where the C side sees
 `NDEBUG` and Swift does not, so the layout test catches a struct whose size changes, and under the
-address and thread sanitizers (`swift test --sanitize=address`, `--sanitize=thread`), which
-anything touching hooks, callbacks or threads must pass.
+address and thread sanitizers, which anything touching hooks, callbacks or threads must pass:
+
+```
+swift test --sanitize=address --disable-xctest
+swift test --sanitize=thread --disable-xctest
+```
+
+`--disable-xctest` skips the XCTest runner, whose own setup code leaks a few objects that the leak
+checker would otherwise report. Scream's tests are all Swift Testing.
 
 ## Formatting and linting
 

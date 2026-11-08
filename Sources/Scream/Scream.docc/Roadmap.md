@@ -6,8 +6,8 @@ Where Scream is and where it is going. Finished items stay in their section, che
 
 - [x] Flecs built from source by SwiftPM on Linux, Windows, macOS and Wasm.
 - [x] Generator for enums and builtin entities from `flecs.h`, and the API coverage page.
-- [ ] World, entities, components, tags, pairs, hierarchies and prefabs.
-- [ ] Lifecycle hooks for components that are not plain data.
+- [x] World, entities, components, tags, pairs, hierarchies and prefabs.
+- [x] Lifecycle hooks for components that are not plain data.
 - [ ] Typed queries and systems, pipelines and phases, observers.
 - [ ] Multi-threaded systems.
 - [ ] DocC documentation with a getting started guide.
@@ -18,7 +18,7 @@ Where Scream is and where it is going. Finished items stay in their section, che
 
 - [ ] Query builder for what the typed API cannot say: variables, traversal, `Or`, cascade.
 - [ ] Modules.
-- [ ] Singletons.
+- [x] Singletons.
 - [ ] Noncopyable components.
 - [ ] Timers and rate filters.
 - [ ] Reflection (the meta addon) for Swift types, so the Explorer can show component values.

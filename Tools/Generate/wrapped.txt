@@ -10,3 +10,48 @@ ecs_fini World (deinit)
 ecs_progress World.progress(deltaTime:)
 ecs_quit World.quit()
 ecs_should_quit World.shouldQuit
+ecs_get_world_info World.deltaTime, World.frameCount, World.targetFPS
+ecs_set_target_fps World.targetFPS
+ecs_set_threads World.setThreads(_:)
+ecs_get_stage World.stage(_:), World.deferred(_:)
+ecs_merge World.deferred(_:)
+ecs_readonly_begin World.readonly(_:)
+ecs_readonly_end World.readonly(_:)
+ecs_set_binding_ctx World.init() (internal)
+ecs_get_binding_ctx WorldAccess (internal)
+ecs_set_scope WorldAccess.component(_:) (internal)
+
+# Entities
+ecs_new WorldAccess.entity()
+ecs_entity_init WorldAccess.entity(_:parent:)
+ecs_lookup WorldAccess.lookup(_:)
+ecs_get_name WorldAccess.name(of:)
+ecs_get_path_w_sep WorldAccess.path(of:)
+ecs_set_name WorldAccess.setName(_:_:)
+ecs_is_alive WorldAccess.isAlive(_:)
+ecs_delete WorldAccess.delete(_:)
+ecs_delete_with WorldAccess.deleteAll(with:)
+ecs_clear WorldAccess.clear(_:)
+ecs_enable WorldAccess.setEnabled(_:_:)
+ecs_get_type WorldAccess.type(of:)
+ecs_get_target WorldAccess.target(of:_:index:)
+ecs_get_parent WorldAccess.parent(of:)
+ecs_children WorldAccess.children(of:)
+ecs_children_next WorldAccess.children(of:)
+
+# Components
+ecs_component_init WorldAccess.component(_:)
+ecs_set_hooks_id WorldAccess.component(_:) (lifecycle hooks for non-plain-data types)
+ecs_add_id WorldAccess.add(_:_:)
+ecs_remove_id WorldAccess.remove(_:_:)
+ecs_has_id WorldAccess.has(_:_:), WorldAccess.isEnabled(_:)
+ecs_emplace_id WorldAccess.set(_:_:), WorldAccess.set(_:_:target:), WorldAccess.setSingleton(_:)
+ecs_modified_id WorldAccess.set(_:_:), WorldAccess.modify(_:_:_:)
+ecs_get_id WorldAccess.get(_:_:), WorldAccess.get(_:_:target:), WorldAccess.singleton(_:)
+ecs_ensure_id WorldAccess.modify(_:_:_:)
+ecs_count_id WorldAccess.count(_:)
+
+# Log
+ecs_log_set_level Log.setLevel(_:)
+ecs_log_enable_colors Log.setColors(_:)
+ecs_os_set_api_defaults Log.setHandler(_:) (through CFlecsShims)
