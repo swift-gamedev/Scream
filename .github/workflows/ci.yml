@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Nothing here writes to the repository.
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-24.04
+    # Keep in step with .swift-version; the first step checks it.
+    container: swift:6.4.2-noble
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+          persist-credentials: false
+      - name: Toolchain matches .swift-version
+        run: |
+          expected="$(cat .swift-version)"
+          swift --version 2>&1 | grep -q "Swift version $expected " || {
+            echo "Container has $(swift --version 2>&1 | head -1), .swift-version says $expected"; exit 1; }
+      - name: Lint
+        run: swift format lint --strict --recursive Sources/Scream Tests Package.swift
+      - name: Build
+        run: swift build
+      - name: Test
+        run: swift test
+      - name: Test in release
+        # The C compile sees NDEBUG here and Swift does not; the layout test checks they agree.
+        run: swift test -c release
+      - name: Test under the address sanitizer
+        run: swift test --sanitize=address
+      - name: Test under the thread sanitizer
+        run: swift test --sanitize=thread
+
+  wasm:
+    name: Wasm
+    runs-on: ubuntu-24.04
+    container: swift:6.4.2-noble
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+          persist-credentials: false
+      - name: Install the Swift SDK for Wasm
+        # The checksum is the one swift.org publishes for this release; keep both in step with
+        # .swift-version.
+        run: |
+          swift sdk install \
+            https://download.swift.org/swift-6.4.2-release/wasm/swift-6.4.2-RELEASE/swift-6.4.2-RELEASE_wasm.artifactbundle.tar.gz \
+            --checksum 83baca83553f8c443cda7b84800912e6e709c3acd2e7ebf277794ca5836c0da5
+      - name: Build
+        run: swift build --swift-sdk swift-6.4.2-RELEASE_wasm
+      - name: Build in release
+        run: swift build -c release --swift-sdk swift-6.4.2-RELEASE_wasm
+
+  macos:
+    name: macOS
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+          persist-credentials: false
+      - name: Install the pinned Swift toolchain
+        # swiftly reads .swift-version.
+        run: |
+          curl -O https://download.swift.org/swiftly/darwin/swiftly.pkg
+          installer -pkg swiftly.pkg -target CurrentUserHomeDirectory
+          ~/.swiftly/bin/swiftly init --quiet-shell-followup --assume-yes --skip-install
+          . ~/.swiftly/env.sh
+          swiftly install --use --assume-yes
+          echo "$HOME/.swiftly/bin" >> "$GITHUB_PATH"
+      - name: Build
+        run: swift build
+      - name: Test
+        run: swift test
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+          persist-credentials: false
+      - name: Read .swift-version
+        id: toolchain
+        shell: pwsh
+        run: '"version=$((Get-Content .swift-version).Trim())" >> $env:GITHUB_OUTPUT'
+      # Pinned to the commit of release v0.5.1.
+      - uses: compnerd/gha-setup-swift@9ff1ee4c44888c5817fc14d1b257ac8cabb4935f
+        with:
+          swift-version: swift-${{ steps.toolchain.outputs.version }}-release
+          swift-build: ${{ steps.toolchain.outputs.version }}-RELEASE
+      - name: Build
+        run: swift build
+      - name: Test
+        run: swift test
