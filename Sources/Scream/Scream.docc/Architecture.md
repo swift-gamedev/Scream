@@ -42,8 +42,16 @@ The Swift API. ``World`` is a noncopyable struct that owns an `ecs_world_t` and 
 `deinit`. ``Entity`` is a plain 64-bit id, `Hashable` and `Sendable`, that holds no pointer to its
 world.
 
-`Sources/Scream/Generated/` holds Flecs' enums and builtin entities, written by the generator.
-Everything else is by hand.
+Queries and systems are typed: ``In``, ``InOut`` and ``Out`` wrap a component and say how it is
+accessed, and the closure receives a ``Ref`` or ``Mut`` per term. The number of terms picks one of
+``Terms1`` through ``Terms8``, which conform to ``QueryTerms`` and carry the closure types and the
+row loop. They are generated rather than written with a parameter pack because Swift does not
+specialize packs: the same row loop measured about 70 times slower with `repeat each` than with
+ordinary generics. The row loop is `@inlinable` all the way down, so it specializes in your module
+and runs within a small factor of the C loop (see <doc:Development> for the benchmark).
+
+`Sources/Scream/Generated/` holds Flecs' enums and builtin entities, and the term lists and
+overloads, all written by the generator. Everything else is by hand.
 
 ## The generator
 
@@ -52,6 +60,7 @@ clang from the Swift toolchain over the umbrella header with `-ast-dump=json` an
 declarations from that: the enums become Swift enums with Flecs' values, every
 `extern const ecs_entity_t Ecs...` becomes a static member of ``Entity``, and every function goes
 on the <doc:APICoverage> page under its Doxygen group, with the Swift symbol from
-`Tools/Generate/wrapped.txt`. With `--check` it only reports whether the committed files are up to
+`Tools/Generate/wrapped.txt`. It also writes the term lists and the query, system and observer
+overloads for one to eight components, which need no input from Flecs. With `--check` it only reports whether the committed files are up to
 date, which CI uses. Because the header has platform conditionals, the committed output is the one
 generated on Linux.

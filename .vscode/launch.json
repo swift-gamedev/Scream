@@ -19,6 +19,26 @@
             "target": "scream-generate",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release scream-generate"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Debug IterationBenchmark",
+            "target": "IterationBenchmark",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug IterationBenchmark"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Release IterationBenchmark",
+            "target": "IterationBenchmark",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release IterationBenchmark"
         }
     ]
 }

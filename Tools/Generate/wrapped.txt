@@ -5,11 +5,11 @@
 # Keep this in step with Sources/Scream: add a line when you wrap a function.
 
 # World
-ecs_init World.init()
-ecs_fini World (deinit)
+ecs_init World.init() (through CFlecsShims, serialized)
+ecs_fini World (deinit) (through CFlecsShims, serialized)
 ecs_progress World.progress(deltaTime:)
-ecs_quit World.quit()
-ecs_should_quit World.shouldQuit
+ecs_quit WorldAccess.quit()
+ecs_should_quit WorldAccess.shouldQuit
 ecs_get_world_info World.deltaTime, World.frameCount, World.targetFPS
 ecs_set_target_fps World.targetFPS
 ecs_set_threads World.setThreads(_:)
@@ -50,6 +50,27 @@ ecs_modified_id WorldAccess.set(_:_:), WorldAccess.modify(_:_:_:)
 ecs_get_id WorldAccess.get(_:_:), WorldAccess.get(_:_:target:), WorldAccess.singleton(_:)
 ecs_ensure_id WorldAccess.modify(_:_:_:)
 ecs_count_id WorldAccess.count(_:)
+
+# Queries
+ecs_query_init World.query(_:filter:)
+ecs_query_fini Query (deinit)
+ecs_query_iter Query.each(_:)
+ecs_query_next Query.each(_:)
+ecs_query_count Query.count
+ecs_query_is_true Query.isEmpty
+ecs_query_str Query.description
+ecs_field_w_size Field.init (internal)
+ecs_field_at_w_size Field.pointer(row:)
+ecs_field_is_self Field.init (internal)
+
+# Systems and pipeline
+ecs_system_init World.system(_:name:phase:filter:each:), World.parallelSystem(_:name:phase:filter:each:)
+ecs_run World.run(_:deltaTime:)
+ecs_set_interval World.setInterval(_:seconds:)
+ecs_set_rate World.setRate(_:frames:)
+
+# Observers
+ecs_observer_init World.observer(_:events:name:filter:yieldExisting:each:)
 
 # Log
 ecs_log_set_level Log.setLevel(_:)

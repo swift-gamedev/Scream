@@ -18,6 +18,9 @@ public protocol Component {}
 /// with it.
 final class WorldContext {
     var componentIds: [ObjectIdentifier: ecs_entity_t] = [:]
+    /// False once the world has been destroyed, for objects that outlive it (a ``Query`` kept
+    /// past its world) and must not touch Flecs any more.
+    var isAlive = true
 }
 
 extension WorldAccess where Self: ~Copyable {
