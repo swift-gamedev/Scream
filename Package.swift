@@ -4,6 +4,10 @@ import PackageDescription
 
 let package = Package(
     name: "Scream",
+    platforms: [
+        // The tools in this package use URL and clock APIs that need macOS 13.
+        .macOS(.v13)
+    ],
     products: [
         .library(name: "Scream", targets: ["Scream"])
     ],

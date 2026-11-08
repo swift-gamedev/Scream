@@ -19,7 +19,7 @@ list them. Flecs links `Ws2_32` for its HTTP addon and `DbgHelp` for backtraces.
 
 ## macOS
 
-A Swift toolchain, from swift.org or Xcode.
+A Swift toolchain, from swift.org or Xcode. The package needs macOS 13 or newer.
 
 ## Web
 
