@@ -68,6 +68,7 @@ jobs:
             test -s screenshots/$example.png
           done
       - uses: actions/upload-artifact@v7
+        if: always()
         with:
           name: screenshots-linux
           path: Examples/SwaylibExamples/screenshots

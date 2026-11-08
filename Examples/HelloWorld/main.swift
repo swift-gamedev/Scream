@@ -27,10 +27,13 @@ let alice = world.entity("Alice")
 world.set(alice, Position(x: 10, y: 20))
 world.set(alice, Velocity(x: -1, y: 0))
 
+// A query is cached by Flecs; create it once and keep it.
+let positions = world.query(In<Position>.self)
+
 for frame in 1...3 {
     world.progress(deltaTime: 0.5)
     print("Frame \(frame):")
-    world.query(In<Position>.self).each { entity, position in
+    positions.each { entity, position in
         print("  \(world.name(of: entity) ?? "?") is at \(position.x), \(position.y)")
     }
 }

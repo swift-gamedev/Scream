@@ -72,7 +72,7 @@ world.system(In<Position>.self, In<Ball>.self, name: "Render", phase: .onStore) 
 
 while !window.shouldClose {
     screen = window.size
-    if Mouse.isDown(.left) {
+    if Mouse.isPressed(.left) {
         addBall(at: Mouse.position)
     }
     drawing {

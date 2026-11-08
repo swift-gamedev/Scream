@@ -19,10 +19,11 @@ let world = World()
 let shipPrefab = world.prefab("ShipPrefab")
 world.set(shipPrefab, Health(points: 100))
 
-// Names with dots are paths: the parents are created as needed.
+// A name with dots is a path, and the parents are created as needed; `parent:` does the same
+// relative to an entity. Both add a (ChildOf, parent) pair.
 let fleet = world.entity("Fleet")
 for name in ["Dawn", "Dusk"] {
-    let ship = world.entity(name, parent: fleet)
+    let ship = world.entity("Fleet.\(name)")
     world.add(ship, .isA(shipPrefab))
     world.add(ship, Ship.self)
     world.set(ship, Position(x: 0, y: 0))

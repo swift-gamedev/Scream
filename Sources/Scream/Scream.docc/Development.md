@@ -38,8 +38,9 @@ package that print and exit, so CI runs them on every platform, including Wasm w
 package `Examples/SwaylibExamples`, with Scream as a path dependency, so Scream itself never
 depends on Swaylib or needs X11 to build. CI runs them for 20 frames with `SWAYLIB_FRAMES` and
 `SWAYLIB_SCREENSHOT` under Xvfb on Linux and directly on macOS, and keeps the screenshots as
-artifacts. When adding an example, add it to the loops in `.github/workflows/ci.yml` and to the
-README.
+artifacts. When adding an example, add an executable target in `Package.swift`, add it to every
+job's example list in `.github/workflows/ci.yml` (the Windows job spells them out), and list it in
+the README.
 
 ## Benchmarks
 
