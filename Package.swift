@@ -54,6 +54,12 @@ let package = Package(
             name: "ScreamTests",
             dependencies: ["Scream"]
         ),
+        // Times Scream's query iteration against the same loop written against the C API.
+        .executableTarget(
+            name: "IterationBenchmark",
+            dependencies: ["Scream", "CFlecs"],
+            path: "Benchmarks/Iteration"
+        ),
         // Writes Sources/Scream/Generated and the API coverage page from the declarations in
         // flecs.h, read through clang's JSON AST dump.
         .executableTarget(

@@ -20,6 +20,7 @@ let wrappedFile = toolDirectory.appending(path: "wrapped.txt")
 let outputs: [(path: String, content: () throws -> String)] = [
     ("Sources/Scream/Generated/Enums.swift", { emitEnums(api) }),
     ("Sources/Scream/Generated/Builtins.swift", { emitBuiltins(api) }),
+    ("Sources/Scream/Generated/Arity.swift", { emitArity() }),
     ("Sources/Scream/Scream.docc/APICoverage.md", { try emitCoverage(api, wrapped: wrapped, version: version) }),
 ]
 

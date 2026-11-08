@@ -15,7 +15,7 @@ struct Position { var x: Double, y: Double }
 struct Velocity { var x: Double, y: Double }
 
 let world = World()
-world.system("Move", phase: .onUpdate, InOut<Position>.self, In<Velocity>.self) { position, velocity in
+world.system(InOut<Position>.self, In<Velocity>.self, name: "Move") { position, velocity in
     position.x += velocity.x
     position.y += velocity.y
 }
@@ -24,13 +24,13 @@ let entity = world.entity("Bob")
 world.set(entity, Position(x: 0, y: 0))
 world.set(entity, Velocity(x: 1, y: 2))
 
-world.progress()
+while world.progress() {}
 ```
 
 Components are plain Swift types, registered the first time a world sees them. Queries and systems
-are typed, with the access mode in the type so Flecs can schedule them. The world owns everything
-and destroys it when it goes out of scope. The names follow Flecs', so its documentation still
-applies.
+are typed, with the access mode in the type so Flecs can schedule them, and iterate within a small
+factor of the C API. The world owns everything and destroys it when it goes out of scope. The names
+follow Flecs', so its documentation still applies.
 
 ## Use it
 
@@ -57,7 +57,10 @@ wrapped. Build it locally with `swift package generate-documentation --target Sc
 
 ## Status
 
-Early. See the roadmap in the docs, and `AGENTS.md` for the design.
+An MVP: entities, components, pairs, hierarchies, prefabs, typed queries, systems (including
+multi-threaded ones), observers and Flecs' log, tested on Linux in debug and release and under
+the sanitizers; Windows, macOS and Wasm build on CI but have not been checked by a person yet. See
+the roadmap in the docs, and `AGENTS.md` for the design.
 
 ## License
 

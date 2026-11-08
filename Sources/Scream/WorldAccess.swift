@@ -280,6 +280,19 @@ extension WorldAccess where Self: ~Copyable {
             Entity(rawValue: screamPairSecond(flecsWorld, id.rawValue)))
     }
 
+    // MARK: Quitting
+
+    /// Makes the next ``World/progress(deltaTime:)`` return `false`, so the frame loop can stop.
+    /// Works from a system, through its stage.
+    public func quit() {
+        ecs_quit(flecsWorld)
+    }
+
+    /// Whether ``quit()`` has been called.
+    public var shouldQuit: Bool {
+        ecs_should_quit(flecsWorld)
+    }
+
     // MARK: Internals
 
     /// The size Flecs stores for `T`: the stride, so that rows line up with Swift pointers, or 0
@@ -296,8 +309,10 @@ extension WorldAccess where Self: ~Copyable {
             ecs_add_id(flecsWorld, entity.rawValue, id)
             return
         }
-        // emplace hands back uninitialized memory for a new component and the existing value
-        // otherwise, so no default constructor is needed, which Swift types do not have.
+        // Swift types have no default initializer Flecs could call, so emplace hands back
+        // uninitialized memory for a new component (the existing value otherwise) and Swift
+        // initializes it. Flecs runs onAdd observers before that, so they must not read values;
+        // Flecs' own set does the same for a component without a constructor.
         var isNew = false
         guard let raw = ecs_emplace_id(flecsWorld, entity.rawValue, id, size, &isNew) else {
             fatalError("Flecs returned no storage for component \(T.self)")

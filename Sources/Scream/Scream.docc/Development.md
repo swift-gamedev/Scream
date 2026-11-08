@@ -23,19 +23,28 @@ address and thread sanitizers, which anything touching hooks, callbacks or threa
 
 ```
 swift test --sanitize=address --disable-xctest
-swift test --sanitize=thread --disable-xctest
+TSAN_OPTIONS=suppressions=$PWD/Tests/tsan-suppressions.txt swift test --sanitize=thread --disable-xctest
 ```
 
 `--disable-xctest` skips the XCTest runner, whose own setup code leaks a few objects that the leak
-checker would otherwise report. Scream's tests are all Swift Testing.
+checker would otherwise report. Scream's tests are all Swift Testing. The suppressions file lists
+two races inside Flecs that Flecs accepts by design; nothing of Scream's is suppressed.
+
+## Benchmarks
+
+`swift run -c release IterationBenchmark` moves a million entities for fifty frames through a
+typed query, through a system, and through the same loop written against the C API, and prints
+the time per entity for each. Run it after changing anything on the iteration path (`Field`,
+`Ref`, `Mut`, `makeFields`, `Query.each`); the typed API should stay within a small factor of
+the C loop.
 
 ## Formatting and linting
 
 `swift format` ships with the toolchain and reads `.swift-format` at the root:
 
 ```
-swift format --in-place --recursive Sources/Scream Tools Tests Package.swift
-swift format lint --strict --recursive Sources/Scream Tools Tests Package.swift
+swift format --in-place --recursive Sources/Scream Tools Tests Benchmarks Package.swift
+swift format lint --strict --recursive Sources/Scream Tools Tests Benchmarks Package.swift
 ```
 
 The Flecs submodule is never formatted.

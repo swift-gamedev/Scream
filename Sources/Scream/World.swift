@@ -23,6 +23,7 @@ public struct World: ~Copyable, WorldAccess {
     }
 
     deinit {
+        context.isAlive = false
         _ = screamFiniWorld(flecsWorld)
     }
 
@@ -35,16 +36,6 @@ public struct World: ~Copyable, WorldAccess {
     @discardableResult
     public func progress(deltaTime: Float = 0) -> Bool {
         ecs_progress(flecsWorld, deltaTime)
-    }
-
-    /// Makes the next ``progress(deltaTime:)`` return `false`.
-    public func quit() {
-        ecs_quit(flecsWorld)
-    }
-
-    /// Whether ``quit()`` has been called.
-    public var shouldQuit: Bool {
-        ecs_should_quit(flecsWorld)
     }
 
     /// The time the last frame took, in seconds, as passed to or measured by

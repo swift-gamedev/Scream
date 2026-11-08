@@ -10,6 +10,10 @@
 #define FLECS_NO_REST
 #endif
 
+// Do not define FLECS_ACCURATE_COUNTERS: in 4.2.0 five counters are int32_t and the atomic
+// increment it switches to writes 64 bits. The plain increments race between worker threads,
+// which Tests/tsan-suppressions.txt covers.
+
 #include "../flecs/distr/flecs.h"
 
 #endif
