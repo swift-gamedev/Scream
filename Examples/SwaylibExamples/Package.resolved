@@ -1,0 +1,15 @@
+{
+  "originHash" : "6258e9966ceaef15685f0e22700da29d817926b2e0d25aded2be2396e3ceb9bd",
+  "pins" : [
+    {
+      "identity" : "swaylib",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swift-gamedev/Swaylib.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f72b6d47381f3b4d9b9c5550fc2ff97cd60bdd04"
+      }
+    }
+  ],
+  "version" : 3
+}

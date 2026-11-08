@@ -39,6 +39,66 @@
             "target": "IterationBenchmark",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release IterationBenchmark"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Debug Observers",
+            "target": "Observers",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Observers"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Release Observers",
+            "target": "Observers",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Observers"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Debug Hierarchy",
+            "target": "Hierarchy",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Hierarchy"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Release Hierarchy",
+            "target": "Hierarchy",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Hierarchy"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Debug HelloWorld",
+            "target": "HelloWorld",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug HelloWorld"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:Scream}",
+            "name": "Release HelloWorld",
+            "target": "HelloWorld",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release HelloWorld"
         }
     ]
 }

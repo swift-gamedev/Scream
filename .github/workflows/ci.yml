@@ -26,11 +26,16 @@ jobs:
           swift --version 2>&1 | grep -q "Swift version $expected " || {
             echo "Container has $(swift --version 2>&1 | head -1), .swift-version says $expected"; exit 1; }
       - name: Lint
-        run: swift format lint --strict --recursive Sources/Scream Tools Tests Benchmarks Package.swift
+        run: swift format lint --strict --recursive Sources/Scream Tools Tests Benchmarks Examples Package.swift
       - name: Generated code is up to date
         run: swift run scream-generate --check
       - name: Build
         run: swift build
+      - name: Run the console examples
+        run: |
+          for example in HelloWorld Hierarchy Observers; do
+            swift run $example
+          done
       - name: Test
         run: swift test
       - name: Test in release
@@ -47,6 +52,25 @@ jobs:
         run: swift build -c release --product IterationBenchmark
       - name: Documentation
         run: swift package generate-documentation --target Scream --warnings-as-errors
+      - name: Install X11, OpenGL and Xvfb for the Swaylib examples
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            libx11-dev libxrandr-dev libxi-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev xvfb
+      - name: Run the Swaylib examples unattended
+        # A separate package, so Scream itself never depends on Swaylib. Each draws 20 frames into
+        # a hidden X server and saves the last one.
+        working-directory: Examples/SwaylibExamples
+        run: |
+          mkdir -p screenshots
+          for example in BouncingBalls SolarSystem; do
+            SWAYLIB_FRAMES=20 SWAYLIB_SCREENSHOT=screenshots/$example.png xvfb-run -a swift run $example
+            test -s screenshots/$example.png
+          done
+      - uses: actions/upload-artifact@v7
+        with:
+          name: screenshots-linux
+          path: Examples/SwaylibExamples/screenshots
 
   wasm:
     name: Wasm
@@ -69,6 +93,15 @@ jobs:
         run: swift build --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream
       - name: Build in release
         run: swift build -c release --swift-sdk swift-6.4.2-RELEASE_wasm --product Scream
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: Run the console examples under Node's WASI
+        run: |
+          for example in HelloWorld Hierarchy Observers; do
+            swift build -c release --swift-sdk swift-6.4.2-RELEASE_wasm --product $example
+            node Examples/run-wasm.mjs .build/release/$example.wasm
+          done
 
   macos:
     name: macOS
@@ -89,8 +122,26 @@ jobs:
           echo "$HOME/.swiftly/bin" >> "$GITHUB_PATH"
       - name: Build
         run: swift build
+      - name: Run the console examples
+        run: |
+          for example in HelloWorld Hierarchy Observers; do
+            swift run $example
+          done
       - name: Test
         run: swift test
+      - name: Run the Swaylib examples unattended
+        working-directory: Examples/SwaylibExamples
+        run: |
+          mkdir -p screenshots
+          for example in BouncingBalls SolarSystem; do
+            SWAYLIB_FRAMES=20 SWAYLIB_SCREENSHOT=screenshots/$example.png swift run $example
+            test -s screenshots/$example.png
+          done
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: screenshots-macos
+          path: Examples/SwaylibExamples/screenshots
 
   windows:
     name: Windows
@@ -111,5 +162,10 @@ jobs:
           swift-build: ${{ steps.toolchain.outputs.version }}-RELEASE
       - name: Build
         run: swift build
+      - name: Run the console examples
+        run: |
+          swift run HelloWorld
+          swift run Hierarchy
+          swift run Observers
       - name: Test
         run: swift test

@@ -54,6 +54,12 @@ let package = Package(
             name: "ScreamTests",
             dependencies: ["Scream"]
         ),
+        // Console examples. Each runs to completion on its own, so CI runs them on every platform,
+        // including Wasm under Node. The ones that draw with Swaylib are a separate package in
+        // Examples/Swaylib, so this package never depends on Swaylib.
+        .executableTarget(name: "HelloWorld", dependencies: ["Scream"], path: "Examples/HelloWorld"),
+        .executableTarget(name: "Hierarchy", dependencies: ["Scream"], path: "Examples/Hierarchy"),
+        .executableTarget(name: "Observers", dependencies: ["Scream"], path: "Examples/Observers"),
         // Times Scream's query iteration against the same loop written against the C API.
         .executableTarget(
             name: "IterationBenchmark",

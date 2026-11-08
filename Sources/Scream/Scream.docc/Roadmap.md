@@ -12,7 +12,7 @@ Where Scream is and where it is going. Finished items stay in their section, che
 - [x] Multi-threaded systems.
 - [x] DocC documentation with a getting started guide.
 - [x] A benchmark of query iteration against the same loop on the C API.
-- [ ] Examples, including ones that draw a Flecs world with Swaylib.
+- [x] Examples, including ones that draw a Flecs world with Swaylib.
 - [ ] CI results on Windows and macOS confirmed green.
 
 ## Flecs features
@@ -34,6 +34,6 @@ Where Scream is and where it is going. Finished items stay in their section, che
 
 - [x] Flecs compiles for WASI with the HTTP and REST addons off.
 - [x] A Swift program drives a world under Node's WASI.
-- [ ] The examples run on Wasm on CI.
+- [x] The console examples run on Wasm on CI, under Node's WASI.
 - [x] Worker threads fall back to the calling thread where there are none.
 - [ ] A browser example with JavaScriptKit, driven from `requestAnimationFrame`.
