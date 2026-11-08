@@ -1,0 +1,26 @@
+# Thread sanitizer suppressions for `swift test --sanitize=thread`. Only races inside Flecs that
+# Flecs accepts by design; nothing in Scream's own code is suppressed.
+#
+# Flecs' statistics counters are plain increments shared by every thread (ecs_os_linc). The
+# atomic variant, FLECS_ACCURATE_COUNTERS, is broken in 4.2.0 (it writes 64 bits into int32_t
+# counters), so the races stay and are listed here by the functions that count.
+race:ecs_os_api_malloc
+race:ecs_os_api_calloc
+race:ecs_os_api_realloc
+race:ecs_os_api_free
+race:flecs_balloc_block
+race:flecs_bfree_w_dbg_info
+race:flecs_stack_page_new
+race:flecs_run_pipeline_ops
+race:flecs_query_trivial_cached_next
+race:ecs_query_iter
+# Every worker thread iterating a cached query writes the same value to the cache's
+# prev_match_count.
+race:flecs_query_cache_iter_init
+# Worker threads waiting for work read the world's flags while the main thread toggles readonly
+# mode around operations such as component registration.
+race:flecs_suspend_readonly
+race:flecs_resume_readonly
+# Every new world writes the same value into the global default lookup path, which lookups on
+# other worlds read.
+race:ecs_mini

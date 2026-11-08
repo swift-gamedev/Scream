@@ -12,22 +12,24 @@ struct CFlecsTests {
         #expect(FLECS_VERSION_MINOR == 2)
     }
 
+    // Worlds are created through the shim, which serializes Flecs' OS API setup; the tests run
+    // in parallel and plain ecs_init calls would race.
     @Test("Creates and destroys a world through the C API")
     func cWorld() {
-        let world = ecs_init()
+        let world = screamInitWorld()
         #expect(world != nil)
         #expect(ecs_progress(world, 0))
-        #expect(ecs_fini(world) == 0)
+        #expect(screamFiniWorld(world) == 0)
     }
 
     @Test("Builds pairs through the shims")
     func pairs() {
         let pair = screamPair(EcsChildOf, EcsFlecs)
         #expect(screamIdIsPair(pair))
-        let world = ecs_init()
+        let world = screamInitWorld()
         #expect(screamPairFirst(world, pair) == EcsChildOf)
         #expect(screamPairSecond(world, pair) == EcsFlecs)
-        _ = ecs_fini(world)
+        _ = screamFiniWorld(world)
     }
 }
 

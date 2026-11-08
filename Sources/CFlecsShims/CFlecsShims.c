@@ -1,5 +1,34 @@
 #include "CFlecsShims.h"
 
+#include <stdatomic.h>
+
+// A spinlock: worlds are created and destroyed rarely, and this must not depend on Flecs' own OS
+// API, which is what the lock protects.
+static atomic_flag worldLock = ATOMIC_FLAG_INIT;
+
+static void lockWorlds(void) {
+    while (atomic_flag_test_and_set_explicit(&worldLock, memory_order_acquire)) {
+    }
+}
+
+static void unlockWorlds(void) {
+    atomic_flag_clear_explicit(&worldLock, memory_order_release);
+}
+
+ecs_world_t *screamInitWorld(void) {
+    lockWorlds();
+    ecs_world_t *world = ecs_init();
+    unlockWorlds();
+    return world;
+}
+
+int screamFiniWorld(ecs_world_t *world) {
+    lockWorlds();
+    int result = ecs_fini(world);
+    unlockWorlds();
+    return result;
+}
+
 static ScreamLogHandler screamLogHandler = NULL;
 static ecs_os_api_log_t flecsDefaultLog = NULL;
 

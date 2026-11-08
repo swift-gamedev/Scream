@@ -1,4 +1,5 @@
 import CFlecs
+import CFlecsShims
 
 /// A Flecs world: the store that holds every entity, component and system.
 ///
@@ -12,11 +13,16 @@ public struct World: ~Copyable {
 
     /// Creates an empty world with Flecs' builtin components, phases and addons.
     public init() {
-        raw = ecs_init()
+        // Through the shim, which serializes world creation: Flecs' OS API setup is not safe to
+        // run from two threads at once.
+        guard let world = screamInitWorld() else {
+            fatalError("Flecs could not create a world")
+        }
+        raw = world
     }
 
     deinit {
-        ecs_fini(raw)
+        _ = screamFiniWorld(raw)
     }
 
     /// Runs one frame: every system in the pipeline, in phase order.

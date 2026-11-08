@@ -9,6 +9,12 @@
 extern "C" {
 #endif
 
+// World creation and destruction, serialized. Flecs sets up its OS API and counts worlds in plain
+// globals when a world is created or destroyed, which races when two threads do it at once (as a
+// parallel test suite does). Everything else Flecs does is per world.
+ecs_world_t *screamInitWorld(void);
+int screamFiniWorld(ecs_world_t *world);
+
 // Pairs. ecs_pair and friends are macros over bit operations, so they get functions here.
 
 static inline ecs_id_t screamPair(ecs_entity_t first, ecs_entity_t second) {
